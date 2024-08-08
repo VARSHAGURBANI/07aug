@@ -1,3 +1,4 @@
+require('dotenv').config();  // Load environment variables from .env file
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -5,13 +6,23 @@ const cors = require('cors');
 const XLSX = require('xlsx');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const mongoose = require('mongoose');
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;  // Use environment variable for port
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// MongoDB Connection
+const mongoURI = process.env.MONGODB_URI;
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 // Set up storage with Multer
 const storage = multer.diskStorage({
