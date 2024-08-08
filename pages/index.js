@@ -1,6 +1,6 @@
+// pages/index.js
 import React from 'react';
-import FileUpload from '../components/FileUpload';
-
+import FileUpload from '../src/components/FileUpload';
 
 const Home = () => {
   return (

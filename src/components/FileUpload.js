@@ -1,3 +1,4 @@
+//src/components/fileupload.js
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -18,8 +19,8 @@ const FileUpload = () => {
     try {
       const response = await axios.post('/api/upload', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       setPdfUrl(response.data.pdfUrl);

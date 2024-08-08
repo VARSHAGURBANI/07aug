@@ -12,7 +12,7 @@ import path from 'path';
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION
+  region: process.env.AWS_REGION,
 });
 
 const s3 = new AWS.S3();
@@ -24,17 +24,19 @@ const upload = multer({
     acl: 'public-read',
     key: function (req, file, cb) {
       cb(null, `${Date.now()}-${file.originalname}`);
-    }
+    },
   }),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedExtensions = ['.xlsx', '.xls'];
     const allowedMimeTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel'
+      'application/vnd.ms-excel',
     ];
 
-    const extname = allowedExtensions.includes(path.extname(file.originalname).toLowerCase());
+    const extname = allowedExtensions.includes(
+      path.extname(file.originalname).toLowerCase()
+    );
     const mimetype = allowedMimeTypes.includes(file.mimetype);
 
     if (extname && mimetype) {
@@ -42,7 +44,7 @@ const upload = multer({
     } else {
       cb(new Error('Only Excel files are allowed'));
     }
-  }
+  },
 });
 
 export default function handler(req, res) {
@@ -73,9 +75,9 @@ export default function handler(req, res) {
         const sheet2 = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]]);
         const sheet3 = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[2]]);
 
-        const names1 = sheet1.map(item => item.Name);
-        const names2 = sheet2.map(item => item.Name);
-        const names3 = sheet3.map(item => item.Name);
+        const names1 = sheet1.map((item) => item.Name);
+        const names2 = sheet2.map((item) => item.Name);
+        const names3 = sheet3.map((item) => item.Name);
 
         console.log('Names from sheet 1:', names1);
         console.log('Names from sheet 2:', names2);
@@ -109,7 +111,7 @@ export default function handler(req, res) {
           doc.pipe(fs.createWriteStream('/dev/null'));
           teams.forEach((team, index) => {
             doc.text(`Team ${index + 1}`);
-            team.forEach(member => doc.text(member));
+            team.forEach((member) => doc.text(member));
             doc.moveDown();
           });
           doc.end();
@@ -134,7 +136,6 @@ export default function handler(req, res) {
       }
     });
   } else {
-    // Method Not Allowed
     res.setHeader('Allow', ['POST']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
