@@ -8,7 +8,6 @@ import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 
-// Configure AWS SDK
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -17,7 +16,6 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-// Middleware setup for multer and S3
 const upload = multer({
   storage: multerS3({
     s3: s3,
@@ -27,7 +25,7 @@ const upload = multer({
       cb(null, `${Date.now()}-${file.originalname}`);
     }
   }),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedExtensions = ['.xlsx', '.xls'];
     const allowedMimeTypes = [
@@ -46,9 +44,7 @@ const upload = multer({
   }
 });
 
-// API route to handle file upload
 export default async (req, res) => {
-  // Use multer to handle file upload
   upload.single('file')(req, res, async (err) => {
     if (err) {
       return res.status(400).send(`Error: ${err.message}`);
@@ -91,13 +87,12 @@ export default async (req, res) => {
 
       const teams = generateTeams(names1, names2, names3);
 
-      // Create PDF
       const doc = new PDFDocument();
       const pdfBuffer = await new Promise((resolve, reject) => {
         const buffers = [];
         doc.on('data', buffers.push.bind(buffers));
         doc.on('end', () => resolve(Buffer.concat(buffers)));
-        doc.pipe(fs.createWriteStream('/dev/null')); // No need to write to a file
+        doc.pipe(fs.createWriteStream('/dev/null'));
         teams.forEach((team, index) => {
           doc.text(`Team ${index + 1}`);
           team.forEach(member => doc.text(member));
@@ -106,7 +101,6 @@ export default async (req, res) => {
         doc.end();
       });
 
-      // Upload PDF to S3
       const pdfS3Params = {
         Bucket: process.env.AWS_S3_BUCKET,
         Key: `${Date.now()}-teams.pdf`,

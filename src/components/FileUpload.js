@@ -16,14 +16,12 @@ const FileUpload = () => {
     formData.append('file', file);
 
     try {
-      // Make sure the URL matches the route on your Vercel deployment
       const response = await axios.post('/api/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
 
-      // Set the PDF URL for download
       setPdfUrl(response.data.pdfUrl);
     } catch (error) {
       console.error('Error uploading file', error);
