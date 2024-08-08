@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState('');
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -18,17 +19,11 @@ const FileUpload = () => {
       const response = await axios.post('http://localhost:5000/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        },
-        responseType: 'blob', // Important to handle PDF response
+        }
       });
 
-      // Create a link to download the PDF
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'teams.pdf');
-      document.body.appendChild(link);
-      link.click();
+      // Set the PDF URL for download
+      setPdfUrl(response.data.pdfUrl);
     } catch (error) {
       console.error('Error uploading file', error);
     }
@@ -38,6 +33,11 @@ const FileUpload = () => {
     <div>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleFileUpload}>Upload</button>
+      {pdfUrl && (
+        <div>
+          <a href={pdfUrl} download="teams.pdf">Download PDF</a>
+        </div>
+      )}
     </div>
   );
 };
